@@ -1,0 +1,19 @@
+{
+    "name": "Froggy Towers",
+    "dependencies": {
+        "device": "*",
+        "arcade-tilemap-a-star": "github:jwunderl/arcade-tilemap-a-star#v0.1.7",
+        "tilemaps": "github:microsoft/pxt-tilemaps#v1.7.1",
+        "arcade-sprite-data": "github:microsoft/arcade-sprite-data#v0.0.5"
+    },
+    "description": "",
+    "files": [
+        "main.blocks",
+        "main.ts",
+        "README.md"
+    ],
+    "preferredEditor": "blocksprj",
+    "testFiles": [
+        "test.ts"
+    ]
+}
