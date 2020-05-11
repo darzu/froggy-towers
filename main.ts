@@ -135,48 +135,6 @@ sprites.onDestroyed(SpriteKind.Timer, function (sprite) {
 sprites.onDestroyed(SpriteKind.RetractingTongue, function (sprite) {
     sprites.readDataSprite(sprite, "line").destroy()
 })
-function towerAttack (tower: Sprite) {
-    getNearestEnemy(tower)
-    if (minDist < 64) {
-        sprites.setDataBoolean(nearestEnemy, "targeted", true)
-        tongueTip = sprites.create(img`
-. . . 2 2 . . . 
-. . 2 2 2 2 . . 
-. . 2 2 2 2 . . 
-. . . 2 2 . . . 
-`, SpriteKind.Tongue)
-        tongueTip.x = tower.x
-        tongueTip.y = tower.y
-        tongueTip.follow(nearestEnemy, 100)
-        sprites.setDataSprite(tongueTip, "source", tower)
-        tongueTip.setFlag(SpriteFlag.AutoDestroy, false)
-        tongueTip.setFlag(SpriteFlag.DestroyOnWall, false)
-        lineBetween(sprites.readDataSprite(tower, "mouth"), tongueTip, 2, 1)
-        tower.setImage(img`
-. . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . 
-. . 4 8 4 8 . . . . . . . . . . 
-. f 1 4 4 4 8 4 8 . . . . . . . 
-4 1 1 4 4 4 4 4 4 4 8 . . . . . 
-4 4 4 4 4 4 4 4 4 4 4 8 . . . . 
-. 4 4 4 4 4 4 4 4 4 4 4 4 8 4 . 
-. 4 4 4 4 4 4 4 4 4 4 4 4 4 4 . 
-. . . 4 4 4 4 4 4 4 4 4 4 4 . . 
-. . . . 4 4 4 4 4 4 4 4 4 4 . . 
-. . . . . 4 8 4 8 8 8 4 4 4 8 8 
-. . . 8 8 4 8 8 8 8 8 8 8 4 4 4 
-. . 8 4 8 8 8 8 8 8 8 8 8 4 . . 
-. . 4 8 8 8 8 8 8 4 4 4 . . . . 
-. . . . . . . . . . . . . . . . 
-`)
-        sprites.setDataSprite(tongueTip, "line", lineSprite)
-        if (0 < nearestEnemy.x - tongueTip.x) {
-            tower.image.flipX()
-            sprites.readDataSprite(tower, "mouth").x = tower.right - 1
-        }
-    }
-}
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Tongue, function (sprite, otherSprite) {
     sprite.destroy()
     otherSprite.setKind(SpriteKind.RetractingTongue)
@@ -286,6 +244,48 @@ function shootIntoOpen (frog: Sprite) {
         tongueTip.vx = -50
     }
 }
+function towerAttack (tower: Sprite) {
+    getNearestEnemy(tower)
+    if (minDist < 64) {
+        sprites.setDataBoolean(nearestEnemy, "targeted", true)
+        tongueTip = sprites.create(img`
+. . . 2 2 . . . 
+. . 2 2 2 2 . . 
+. . 2 2 2 2 . . 
+. . . 2 2 . . . 
+`, SpriteKind.Tongue)
+        tongueTip.x = tower.x
+        tongueTip.y = tower.y
+        tongueTip.follow(nearestEnemy, 100)
+        sprites.setDataSprite(tongueTip, "source", tower)
+        tongueTip.setFlag(SpriteFlag.AutoDestroy, false)
+        tongueTip.setFlag(SpriteFlag.DestroyOnWall, false)
+        lineBetween(sprites.readDataSprite(tower, "mouth"), tongueTip, 2, 1)
+        tower.setImage(img`
+. . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . 
+. . 4 8 4 8 . . . . . . . . . . 
+. f 1 4 4 4 8 4 8 . . . . . . . 
+4 1 1 4 4 4 4 4 4 4 8 . . . . . 
+4 4 4 4 4 4 4 4 4 4 4 8 . . . . 
+. 4 4 4 4 4 4 4 4 4 4 4 4 8 4 . 
+. 4 4 4 4 4 4 4 4 4 4 4 4 4 4 . 
+. . . 4 4 4 4 4 4 4 4 4 4 4 . . 
+. . . . 4 4 4 4 4 4 4 4 4 4 . . 
+. . . . . 4 8 4 8 8 8 4 4 4 8 8 
+. . . 8 8 4 8 8 8 8 8 8 8 4 4 4 
+. . 8 4 8 8 8 8 8 8 8 8 8 4 . . 
+. . 4 8 8 8 8 8 8 4 4 4 . . . . 
+. . . . . . . . . . . . . . . . 
+`)
+        sprites.setDataSprite(tongueTip, "line", lineSprite)
+        if (0 < nearestEnemy.x - tongueTip.x) {
+            tower.image.flipX()
+            sprites.readDataSprite(tower, "mouth").x = tower.right - 1
+        }
+    }
+}
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     if (canBuild) {
         buildTower()
@@ -332,16 +332,16 @@ let x = 0
 let destination: Sprite = null
 let source: Sprite = null
 let canBuild = false
+let tongueTip: Sprite = null
 let timerSprite: Sprite = null
+let lineSprite: Sprite = null
 let frogMouth: Sprite = null
 let buildLocation: tiles.Location = null
 let newSprite: Sprite = null
+let minDist = 0
+let nearestEnemy: Sprite = null
 let dist2 = 0
 let minDist2 = 0
-let lineSprite: Sprite = null
-let tongueTip: Sprite = null
-let nearestEnemy: Sprite = null
-let minDist = 0
 let frog: Sprite = null
 scene.setBackgroundColor(6)
 tiles.setTilemap(tiles.createTilemap(
